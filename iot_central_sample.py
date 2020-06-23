@@ -1,4 +1,4 @@
-
+# general imports
 import os
 import time
 import asyncio
@@ -166,7 +166,7 @@ async def main():
                 os.remove('dpsCache.json')
                 continue
         else:
-            if use_x509:
+            if use_x509: # register the device using the X509 certificate
                 current_path = os.path.dirname(os.path.abspath(__file__))
                 x509 = X509(
                     cert_file=os.path.join(current_path, x509_public_cert_file),
@@ -180,8 +180,8 @@ async def main():
                     x509=x509,
                     websockets=use_websockets
                 )
-            else:
-                if use_group_symmetric_key:
+            else: # use symmetric key
+                if use_group_symmetric_key: # use group symmetric key to generate a device symmetric key
                     device_symmetric_key = derive_device_key(device_id, group_symmetric_key)
 
                 provisioning_device_client = ProvisioningDeviceClient.create_from_symmetric_key(
@@ -216,13 +216,13 @@ async def main():
                 dps_registered = True
 
         if dps_registered:
-            if use_x509:
+            if use_x509:  # create device client on IoT Hub using the X509 certificate
                 device_client = IoTHubDeviceClient.create_from_x509_certificate(
                     x509=x509,
                     hostname=registration_result.registration_state.assigned_hub,
                     device_id=registration_result.registration_state.device_id,
                 )
-            else:
+            else:  # create device client on IoT Hub using a device symmetric key
                 device_client = IoTHubDeviceClient.create_from_symmetric_key(
                     symmetric_key=dps_cache[0],
                     hostname=dps_cache[1],

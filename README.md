@@ -21,6 +21,8 @@ and set use_websockets to true or false depending on if MQTT ports are blocked o
 
 Features enabled in this sample:
   * Supports DPS with cached DPS credentials (to file system) so a DPS call is not needed every connection
+  * Supports symmetric key and X509 certificate DPS and hub connection
+  * Supports using group symmetric key to generate a device symmetric key
   * if connection fails with cached credentials falls back to re-call DPS
   * Supports device side registration of the device in IoT Central with auto-association to a device model
   * Illustrates sending telemetry to IoT Central
