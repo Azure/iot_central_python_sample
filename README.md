@@ -34,7 +34,7 @@ Features enabled in this sample:
 
 This sample application uses the device template model in the device-capability-model.json file.  This template should be imported into the IoT Central application, and appropriate views generated or created from the device template.
 
-To use first open the iot_central_config.py file and enter in the necessary configuration information based on you IoT Central application
+To use first open the iot_central_config.py file and enter in the necessary configuration information based on you IoT Central application.  If X509 device authentication is desired please see these articles on generating the necessary certificates for IoT Central https://docs.microsoft.com/en-us/azure/iot-central/core/concepts-get-connected#connect-devices-using-x509-certificates, https://github.com/Azure/azure-iot-sdk-c/tree/master/tools/CACertificates
 
 ```python
 # IoT Central connection settings
@@ -93,3 +93,5 @@ q
 Quitting...
 Disconnecting from IoT Hub
 ```
+
+Note: Currently the Cloud to Device (C2D) feature is in preview and behind a feature flag.  To use C2D please add the following to the url ?flights=c2d

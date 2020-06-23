@@ -115,6 +115,7 @@ async def twin_patch_handler(device_client):
         await desired_ack(patch, 200, "completed")
 
 
+# coroutine that handles direct methods from IoT Central (or hub) until terminated
 async def direct_method_handler(device_client):
     while not terminate:
         method_request = (
@@ -133,15 +134,43 @@ async def direct_method_handler(device_client):
         await device_client.send_method_response(method_response)
 
 
+# ASCII art fireworks in the color passed in :-)
+def fireworks(color):
+    print(color.format("                                 .''."))
+    print(color.format("       .''.             *''*    :_\/_:     ."))
+    print(color.format("      :_\/_:   .    .:.*_\/_*   : /\ :  .'.:.'."))
+    print(color.format("  .''.: /\ : _\(/_  ':'* /\ *  : '..'.  -=:o:=-"))
+    print(color.format(" :_\/_:'.:::. /)\*''*     * '.\\'/.'_\(/_'.':'.'"))
+    print(color.format(" : /\ : :::::  '*_\/_*      -= o =- /)\    '  *"))
+    print(color.format("  '..'  ':::'   * /\ *      .'/.\\'.  '"))
+    print(color.format("      *          *  *"))
+    print(color.format("        *"))
+
+
+# handles the Cloud to Device (C2D) messages
 async def message_listener(device_client):
     while not terminate:
         message = await device_client.receive_message()  # blocking call
-        print("the data in the message received was ")
-        print(message.data)
-        print("custom properties are")
-        print(message.custom_properties)
-        print("content Type: {0}".format(message.content_type))
-        print("")
+        if message.custom_properties['method-name'] == 'pythonsample:fireworks':
+            data_str = message.data.decode('utf-8')
+            output_text = 'Fireworks! Fireworks!, Fireworks!'
+            if data_str == '"RED"':
+                fireworks("\033[91m {}\033[00m")
+            elif data_str == '"GREEN"':
+                fireworks("\033[92m {}\033[00m")
+            elif data_str == '"BLUE"':
+                fireworks("\033[34m {}\033[00m")
+            elif data_str == '"YELLOW"':
+                fireworks("\033[93m {}\033[00m")
+            elif data_str == '"WHITE"':
+                fireworks("\033[00m {}\033[00m")
+        else:
+            print("the data in the message received was ")
+            print(message.data)
+            print("custom properties are")
+            print(message.custom_properties)
+            print("content Type: {0}".format(message.content_type))
+            print("")
 
 
 # main function: looks for cached DPS information in the file dpsCache.json and uses it to do a direct connection to the IoT hub.
@@ -230,7 +259,7 @@ async def main():
                     websockets=use_websockets
                 )
 
-        # connect
+        # connect to IoT Hub
         try:
             await device_client.connect()
             connected = True

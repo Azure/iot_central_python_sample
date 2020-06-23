@@ -86,9 +86,55 @@
               "schema": "string"
             },
             "displayName": {
-              "en": "echo"
+              "en": "Echo"
             },
             "name": "echo"
+          },
+          {
+            "@type": "Command",
+            "durable": true,
+            "request": {
+              "@type": "SchemaField",
+              "displayName": {
+                "en": "Color"
+              },
+              "name": "color",
+              "schema": {
+                "@type": "Enum",
+                "valueSchema": "string",
+                "enumValues": [
+                    {
+                        "name": "red",
+                        "displayName": "Red",
+                        "enumValue": "RED"
+                    },
+                    {
+                        "name": "green",
+                        "displayName": "Green",
+                        "enumValue": "GREEN"
+                    },
+                    {
+                        "name": "blue",
+                        "displayName": "Blue",
+                        "enumValue": "BLUE"
+                    },
+                    {
+                        "name": "yellow",
+                        "displayName": "Yellow",
+                        "enumValue": "YELLOW"
+                    },
+                    {
+                        "name": "white",
+                        "displayName": "White",
+                        "enumValue": "WHITE"
+                    }
+                ]
+            }
+            },
+            "displayName": {
+              "en": "fireworks"
+            },
+            "name": "fireworks"
           }
         ],
         "@context": [
