@@ -10,21 +10,25 @@ import json
 import string
 from six.moves import input
 
+
 # uses the Azure IoT Device SDK for Python (Native Python libraries)
 from azure.iot.device.aio import ProvisioningDeviceClient
 from azure.iot.device.aio import IoTHubDeviceClient
 from azure.iot.device import Message
+from azure.iot.device import X509
 from azure.iot.device import MethodResponse
 from azure.iot.device import exceptions
 
+
 # configurable values imported from iot_central_config.py module
-from iot_central_config import id_scope, device_id, group_symmetric_key, device_symmetric_key, model_identity, use_websockets, use_group_symmetric_key
+from iot_central_config import *
+
 
 # global variable declarations
 provisioning_host = "global.azure-devices-provisioning.net"
 device_client = None
 terminate = False
-use_cached_credentials = False
+
 
 # derives a symmetric device key for a device id using the group symmetric key
 def derive_device_key(device_id, group_symmetric_key):
@@ -47,6 +51,7 @@ def read_dps_cache_from_file():
         cache = json.load(f)
     return cache
 
+
 # define behavior for halting the application
 def keyboard_monitor(killTasks):
     global terminate
@@ -57,6 +62,7 @@ def keyboard_monitor(killTasks):
             for task in killTasks:
                 task.cancel()
             terminate = True
+
 
 # coroutine that sends telemetry on a set frequency until terminated
 async def send_telemetry(device_client, send_frequency):
@@ -126,6 +132,7 @@ async def direct_method_handler(device_client):
 
         await device_client.send_method_response(method_response)
 
+
 async def message_listener(device_client):
     while not terminate:
         message = await device_client.receive_message()  # blocking call
@@ -148,6 +155,7 @@ async def main():
     dps_registered = False
     connected = False
     connection_retry_count = 1
+    x509 = None
 
     while (not connected): # and (connection_retry_count < 3):
         if use_cached_credentials and os.path.exists('dpsCache.json'):
@@ -158,16 +166,31 @@ async def main():
                 os.remove('dpsCache.json')
                 continue
         else:
-            if use_group_symmetric_key:
-                device_symmetric_key = derive_device_key(device_id, group_symmetric_key)
+            if use_x509:
+                current_path = os.path.dirname(os.path.abspath(__file__))
+                x509 = X509(
+                    cert_file=os.path.join(current_path, x509_public_cert_file),
+                    key_file=os.path.join(current_path, x509_private_cert_file),
+                    pass_phrase=x509_pass_phrase
+                )
+                provisioning_device_client = ProvisioningDeviceClient.create_from_x509_certificate(
+                    provisioning_host=provisioning_host,
+                    registration_id=device_id,
+                    id_scope=id_scope,
+                    x509=x509,
+                    websockets=use_websockets
+                )
+            else:
+                if use_group_symmetric_key:
+                    device_symmetric_key = derive_device_key(device_id, group_symmetric_key)
 
-            provisioning_device_client = ProvisioningDeviceClient.create_from_symmetric_key(
-                provisioning_host=provisioning_host,
-                registration_id=device_id,
-                id_scope=id_scope,
-                symmetric_key=device_symmetric_key,
-                websockets=use_websockets
-            )
+                provisioning_device_client = ProvisioningDeviceClient.create_from_symmetric_key(
+                    provisioning_host=provisioning_host,
+                    registration_id=device_id,
+                    id_scope=id_scope,
+                    symmetric_key=device_symmetric_key,
+                    websockets=use_websockets
+                )
 
             provisioning_device_client.provisioning_payload = '{"iotcModelId":"%s"}' % (model_identity)
             registration_result = None
@@ -193,12 +216,19 @@ async def main():
                 dps_registered = True
 
         if dps_registered:
-            device_client = IoTHubDeviceClient.create_from_symmetric_key(
-                symmetric_key=dps_cache[0],
-                hostname=dps_cache[1],
-                device_id=dps_cache[2],
-                websockets=use_websockets
-            )
+            if use_x509:
+                device_client = IoTHubDeviceClient.create_from_x509_certificate(
+                    x509=x509,
+                    hostname=registration_result.registration_state.assigned_hub,
+                    device_id=registration_result.registration_state.device_id,
+                )
+            else:
+                device_client = IoTHubDeviceClient.create_from_symmetric_key(
+                    symmetric_key=dps_cache[0],
+                    hostname=dps_cache[1],
+                    device_id=dps_cache[2],
+                    websockets=use_websockets
+                )
 
         # connect
         try:
@@ -236,6 +266,7 @@ async def main():
     # finally, disconnect
     print("Disconnecting from IoT Hub")
     await device_client.disconnect()
+
 
 # start the main routine
 if __name__ == "__main__":
