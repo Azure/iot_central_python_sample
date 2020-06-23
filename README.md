@@ -10,7 +10,7 @@ The code uses six library for detecting Q+[enter] key press to perform clean shu
 install the libraries with: 
 
 ```
-pip install azure-iot-device si
+pip install azure-iot-device six
 ```
 
 The capability model for IoT Central is in the file device-capability-model.json and should be loaded into the IoT Central application
