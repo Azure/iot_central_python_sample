@@ -1,0 +1,100 @@
+{
+  "@id": "urn:sample:python:1",
+  "@type": "CapabilityModel",
+  "displayName": "Python sample model",
+  "description": "Created for use with the python sample code for IoT Central - Feb 2020",
+  "@context": [
+      "http://azureiot.com/v1/contexts/IoTModel.json"
+  ],
+  "implements": [ 
+    {
+      "@type": "InterfaceInstance",
+      "name": "pythonsample",
+      "schema": {
+        "@id": "urn:sample:python:iotcentral:1",
+        "@type": "Interface",
+        "displayName": {
+          "en": "Interface"
+        },
+        "contents": [
+          {
+            "@type": "Telemetry",
+            "displayName": {
+              "en": "temp"
+            },
+            "name": "temp",
+            "schema": "double"
+          },
+          {
+            "@type": "Telemetry",
+            "displayName": {
+              "en": "humidity"
+            },
+            "name": "humidity",
+            "schema": "double"
+          },
+          {
+            "@type": "Property",
+            "displayName": {
+              "en": "fan"
+            },
+            "name": "fan",
+            "writable": true,
+            "schema": "boolean"
+          },
+          {
+            "@type": "Property",
+            "displayName": {
+              "en": "text"
+            },
+            "name": "text",
+            "schema": "string"
+          },
+          {
+            "@type": "Property",
+            "displayName": {
+              "en": "number"
+            },
+            "name": "number",
+            "schema": "double"
+          },
+          {
+            "@type": "Property",
+            "displayName": {
+              "en": "boolean"
+            },
+            "name": "boolean",
+            "schema": "boolean"
+          },
+          {
+            "@type": "Command",
+            "commandType": "synchronous",
+            "request": {
+              "@type": "SchemaField",
+              "displayName": {
+                "en": "text"
+              },
+              "name": "text",
+              "schema": "string"
+            },
+            "response": {
+              "@type": "SchemaField",
+              "displayName": {
+                "en": "echotext"
+              },
+              "name": "echotext",
+              "schema": "string"
+            },
+            "displayName": {
+              "en": "echo"
+            },
+            "name": "echo"
+          }
+        ],
+        "@context": [
+          "http://azureiot.com/v1/contexts/IoTModel.json"
+        ]
+      }
+    }
+  ]
+}
