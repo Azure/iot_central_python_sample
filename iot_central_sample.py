@@ -70,6 +70,8 @@ async def send_telemetry(device_client, send_frequency):
         payload = '{"temp": %f, "humidity": %f}' % (random.randrange(60.0, 95.0), random.randrange(10.0, 100.0))
         print("sending message: %s" % (payload))
         msg = Message(payload)
+        msg.content_type = "application/json"
+        msg.content_encoding = "utf-8"
         await device_client.send_message(msg)
         print("completed sending message")
         await asyncio.sleep(send_frequency)
