@@ -103,7 +103,8 @@ async def desired_ack(json_data, status_code, status_text):
     if list(json_data.keys())[0] == "$version":
         key = list(json_data.keys())[1]
 
-    reported_payload = {key:{"value":json_data[key]['value'],"statusCode":status_code,"status":status_text,"desiredVersion":json_data['$version']}}
+    reported_payload = {key:{"value": json_data[key], "ac":status_code,"ad":status_text,"av":json_data['$version']}}
+
     print(reported_payload)
     await device_client.patch_twin_reported_properties(reported_payload)
 
