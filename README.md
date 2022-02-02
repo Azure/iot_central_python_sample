@@ -1,4 +1,4 @@
-# Iot_Central_Python_Sample
+# iot_central_python_sample
 Interacting with Azure IoT Central using a device written in Python
 
 uses the Azure IoT Native Python Device SDK details found here: https://github.com/Azure/azure-iot-sdk-python/tree/master/azure-iot-device
